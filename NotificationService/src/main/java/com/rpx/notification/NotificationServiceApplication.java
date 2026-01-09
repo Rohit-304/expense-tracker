@@ -1,13 +1,13 @@
-package com.rpx.AuthenticationService;
+package com.rpx.notification;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AuthenticationServiceApplication {
+public class NotificationServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AuthenticationServiceApplication.class, args);
+		SpringApplication.run(NotificationServiceApplication.class, args);
 	}
 
 }
