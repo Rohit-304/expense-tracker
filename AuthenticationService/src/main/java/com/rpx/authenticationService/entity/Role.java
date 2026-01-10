@@ -1,4 +1,4 @@
-package com.rpx.Entity;
+package com.rpx.authenticationService.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,21 +8,26 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "user_role")
-public class UserRole {
+@Table(name = "role")
+public class Role {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Long id;
+	
 	@Column(name = "name")
 	private String name;
+	
+	@Column(name = "is_active")
+	private Boolean isActive;
 
-	public UserRole() {
+	public Role() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public UserRole(Long id, String name) {
+	public Role(Long id, String name) {
 		super();
 		this.id = id;
 		this.name = name;
