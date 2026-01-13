@@ -24,6 +24,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private CustomizedUserDetailServiceImpl customizedUserDetailServiceImpl;
 
 	@Autowired
 	private JwtService jwtService;
@@ -51,8 +54,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void userRegister(RegisterRequestDto requestDto) {
+	public CustomResponse userRegister(RegisterRequestDto requestDto) {
+		try {
+			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
+			User user = setObject.convertRegisterRequestToUserEntity(requestDto);
+			user.setCreatedBy(userDetails.get());
+			userRepository.save(user);
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Registered Successful!");
 
+		} catch (Exception e) {
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, HttpStatus.BAD_REQUEST.toString());
+		}
 	}
 
 }
