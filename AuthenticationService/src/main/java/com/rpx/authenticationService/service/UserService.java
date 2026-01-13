@@ -8,6 +8,6 @@ public interface UserService {
 
 	CustomResponse getloginCredential(LoginRequestDto requestDto);
 
-	void userRegister(RegisterRequestDto requestDto);
+	CustomResponse userRegister(RegisterRequestDto requestDto);
 
 }

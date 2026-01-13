@@ -65,7 +65,7 @@ public class User {
 	}
 
 	public User(Long id, String name, String userName, String password, String email, String mobileNumber, Long roleId,
-			Role role, Boolean isActive, Date createdon, User createdBy, Date updatedon, User updatedBy) {
+			 Boolean isActive, Date createdon, User createdBy, Date updatedon, User updatedBy) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -74,7 +74,6 @@ public class User {
 		this.email = email;
 		this.mobileNumber = mobileNumber;
 		this.roleId = roleId;
-		this.role = role;
 		this.isActive = isActive;
 		this.createdon = createdon;
 		this.createdBy = createdBy;

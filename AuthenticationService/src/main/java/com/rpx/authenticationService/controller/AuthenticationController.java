@@ -26,8 +26,8 @@ public class AuthenticationController {
 
 	@PostMapping
 	public ResponseEntity<?> userRegister(@RequestBody RegisterRequestDto requestDto) {
-		userService.userRegister(requestDto);
-		return ResponseEntity.ok("Registered Successful!");
+		CustomResponse response = userService.userRegister(requestDto);
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping(value = "/login")
@@ -39,5 +39,4 @@ public class AuthenticationController {
 		}
 		return ResponseEntity.ok(validationResponse);
 	}
-
 }
