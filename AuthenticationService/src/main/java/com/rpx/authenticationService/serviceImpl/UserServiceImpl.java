@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.rpx.authenticationService.dto.CustomResponse;
@@ -24,9 +25,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private CustomizedUserDetailServiceImpl customizedUserDetailServiceImpl;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private JwtService jwtService;
@@ -39,11 +43,15 @@ public class UserServiceImpl implements UserService {
 		try {
 			Optional<User> userOptional = userRepository.findByUserName(requestDto.getUserName());
 			if (userOptional.isPresent()) {
-				User user = userOptional.get();
-				String token = jwtService.generateToken(user.getUserName());
-				LoginResponseDto response = setObject.convertToLoginResponse(user, token);
-				return new CustomResponse(HttpStatus.BAD_REQUEST.value(), response, "Login Successful!");
 
+				User user = userOptional.get();
+				if (passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+
+					String token = jwtService.generateToken(user.getUserName());
+					LoginResponseDto response = setObject.convertToLoginResponse(user, token);
+					return new CustomResponse(HttpStatus.OK.value(), response, "Login Successful!");
+				}
+				return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Incorrect Password");
 			}
 			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Invalid Credential");
 
@@ -58,9 +66,12 @@ public class UserServiceImpl implements UserService {
 		try {
 			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
 			User user = setObject.convertRegisterRequestToUserEntity(requestDto);
-			user.setCreatedBy(userDetails.get());
+			String encodedPassword = passwordEncoder.encode(user.getPassword());
+			user.setPassword(encodedPassword);
+			if (userDetails.isPresent())
+				user.setCreatedBy(userDetails.get());
 			userRepository.save(user);
-			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Registered Successful!");
+			return new CustomResponse(HttpStatus.OK.value(), null, "Registered Successful!");
 
 		} catch (Exception e) {
 			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, HttpStatus.BAD_REQUEST.toString());

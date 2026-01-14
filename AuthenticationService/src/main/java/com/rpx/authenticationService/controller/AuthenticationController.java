@@ -24,10 +24,14 @@ public class AuthenticationController {
 	@Autowired
 	private Validation validation;
 
-	@PostMapping
-	public ResponseEntity<?> userRegister(@RequestBody RegisterRequestDto requestDto) {
-		CustomResponse response = userService.userRegister(requestDto);
+	@PostMapping(value = "/register")
+	public ResponseEntity<?> userRegister(@RequestBody RegisterRequestDto request) {
+		CustomResponse validationResponse = validation.validateRegisterRequest(request);
+		if (validationResponse.getCode() == HttpStatus.OK.value()) {
+		CustomResponse response = userService.userRegister(request);
 		return ResponseEntity.ok(response);
+		}
+		return ResponseEntity.ok(validationResponse);
 	}
 
 	@PostMapping(value = "/login")
