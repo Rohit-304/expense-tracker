@@ -50,7 +50,7 @@ public class CustomizedUserDetailServiceImpl implements UserDetailsService {
 	public Optional<User> getUserDetails() {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			Optional<User> user = userRepository.findByEmail(auth.getName());
+			Optional<User> user = userRepository.findByUserName(auth.getName());
 			return user;
 		} catch (Exception e) {
 			return Optional.empty();
