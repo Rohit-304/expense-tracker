@@ -1,5 +1,8 @@
 package com.rpx.authenticationService.serviceImpl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.rpx.authenticationService.dto.CustomResponse;
 import com.rpx.authenticationService.dto.LoginRequestDto;
 import com.rpx.authenticationService.dto.LoginResponseDto;
-import com.rpx.authenticationService.dto.RegisterRequestDto;
+import com.rpx.authenticationService.dto.userDto;
 import com.rpx.authenticationService.entity.User;
 import com.rpx.authenticationService.repository.UserRepository;
 import com.rpx.authenticationService.service.JwtService;
@@ -62,14 +65,16 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public CustomResponse userRegister(RegisterRequestDto requestDto) {
+	public CustomResponse userRegister(userDto dto) {
 		try {
 			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
-			User user = setObject.convertRegisterRequestToUserEntity(requestDto);
+			User user = setObject.convertUserDtoToEntity(dto);
 			String encodedPassword = passwordEncoder.encode(user.getPassword());
 			user.setPassword(encodedPassword);
-			if (userDetails.isPresent())
+			if (userDetails.isPresent()) {
+				user.setCreatedOn(new Date());
 				user.setCreatedBy(userDetails.get());
+			}
 			userRepository.save(user);
 			return new CustomResponse(HttpStatus.OK.value(), null, "Registered Successful!");
 
@@ -78,4 +83,31 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	@Override
+	public CustomResponse saveOrUpdateUser(List<userDto> request) {
+		try {
+			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
+			List<User> updateUserList = request.stream().filter(Objects::nonNull)
+					.map(e -> setObject.convertUserDtoToEntity(e)).toList();
+			User loggedInUser = userDetails.get();
+			Date date = new Date();
+			if (updateUserList != null && !updateUserList.isEmpty()) {
+				for (User user : updateUserList) {
+					if (user.getId() == null) {
+						user.setCreatedOn(date);
+						user.setCreatedBy(loggedInUser);
+					} else {
+						user.setUpdatedOn(date);
+						user.setUpdatedBy(loggedInUser);
+					}
+				}
+			}
+
+			userRepository.saveAll(updateUserList);
+			return new CustomResponse(HttpStatus.OK.value(), null, "Updated Successfully!");
+
+		} catch (Exception e) {
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, HttpStatus.BAD_REQUEST.toString());
+		}
+	}
 }

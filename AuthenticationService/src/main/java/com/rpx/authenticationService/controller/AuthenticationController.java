@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rpx.authenticationService.dto.CustomResponse;
 import com.rpx.authenticationService.dto.LoginRequestDto;
-import com.rpx.authenticationService.dto.RegisterRequestDto;
+import com.rpx.authenticationService.dto.userDto;
 import com.rpx.authenticationService.service.UserService;
 import com.rpx.authenticationService.util.Validation;
 
@@ -25,11 +25,11 @@ public class AuthenticationController {
 	private Validation validation;
 
 	@PostMapping(value = "/register")
-	public ResponseEntity<?> userRegister(@RequestBody RegisterRequestDto request) {
-		CustomResponse validationResponse = validation.validateRegisterRequest(request);
+	public ResponseEntity<?> saveOrUpdateUser(@RequestBody userDto request) {
+		CustomResponse validationResponse = validation.validateUserRequest(request);
 		if (validationResponse.getCode() == HttpStatus.OK.value()) {
-		CustomResponse response = userService.userRegister(request);
-		return ResponseEntity.ok(response);
+			CustomResponse response = userService.userRegister(request);
+			return ResponseEntity.ok(response);
 		}
 		return ResponseEntity.ok(validationResponse);
 	}
