@@ -46,14 +46,14 @@ public class User {
 	private Boolean isActive;
 
 	@Column(name = "created_on")
-	private Date createdon;
+	private Date createdOn;
 
 	@OneToOne
 	@JoinColumn(name = "created_by")
 	private User createdBy;
 
 	@Column(name = "updated_on")
-	private Date updatedon;
+	private Date updatedOn;
 
 	@OneToOne
 	@JoinColumn(name = "updated_by")
@@ -65,7 +65,7 @@ public class User {
 	}
 
 	public User(Long id, String name, String userName, String password, String email, String mobileNumber, Long roleId,
-			 Boolean isActive, Date createdon, User createdBy, Date updatedon, User updatedBy) {
+			Boolean isActive, Date createdOn, User createdBy, Date updatedOn, User updatedBy) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -75,10 +75,22 @@ public class User {
 		this.mobileNumber = mobileNumber;
 		this.roleId = roleId;
 		this.isActive = isActive;
-		this.createdon = createdon;
+		this.createdOn = createdOn;
 		this.createdBy = createdBy;
-		this.updatedon = updatedon;
+		this.updatedOn = updatedOn;
 		this.updatedBy = updatedBy;
+	}
+	
+	public User(Long id, String name, String userName, String email, String mobileNumber, Long roleId,
+			Boolean isActive) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.userName = userName;
+		this.email = email;
+		this.mobileNumber = mobileNumber;
+		this.roleId = roleId;
+		this.isActive = isActive;
 	}
 
 	public Long getId() {
@@ -153,12 +165,12 @@ public class User {
 		this.isActive = isActive;
 	}
 
-	public Date getCreatedon() {
-		return createdon;
+	public Date getCreatedOn() {
+		return createdOn;
 	}
 
-	public void setCreatedon(Date createdon) {
-		this.createdon = createdon;
+	public void setCreatedOn(Date createdOn) {
+		this.createdOn = createdOn;
 	}
 
 	public User getCreatedBy() {
@@ -169,12 +181,12 @@ public class User {
 		this.createdBy = createdBy;
 	}
 
-	public Date getUpdatedon() {
-		return updatedon;
+	public Date getUpdatedOn() {
+		return updatedOn;
 	}
 
-	public void setUpdatedon(Date updatedon) {
-		this.updatedon = updatedon;
+	public void setUpdatedOn(Date updatedOn) {
+		this.updatedOn = updatedOn;
 	}
 
 	public User getUpdatedBy() {

@@ -1,6 +1,8 @@
 package com.rpx.authenticationService.dto;
 
-public class RegisterRequestDto {
+public class userDto {
+	
+	private Long id;
 
 	private String name;
 
@@ -14,12 +16,12 @@ public class RegisterRequestDto {
 
 	private Long roleId;
 
-	public RegisterRequestDto() {
+	public userDto() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public RegisterRequestDto(String name, String userName, String password, String email, String mobileNumber,
+	public userDto(String name, String userName, String password, String email, String mobileNumber,
 			Long roleId) {
 		super();
 		this.name = name;
@@ -28,6 +30,14 @@ public class RegisterRequestDto {
 		this.email = email;
 		this.mobileNumber = mobileNumber;
 		this.roleId = roleId;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getName() {
