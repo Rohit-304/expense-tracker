@@ -29,7 +29,7 @@ public class UserController {
 	public ResponseEntity<?> updateUser(@RequestBody List<userDto> dto) {
 		CustomResponse validationResponse = validation.validateListOfUser(dto);
 		if (validationResponse.getCode() == HttpStatus.OK.value()) {
-			CustomResponse response = userService.saveOrUpdateUser(dto);
+			CustomResponse response = userService.updateUser(dto);
 			return ResponseEntity.ok(response);
 		}
 		return ResponseEntity.ok(validationResponse);
