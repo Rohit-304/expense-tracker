@@ -73,4 +73,24 @@ public class Validation {
 		}
 		return new CustomResponse(HttpStatus.OK.value(), errorMessage, "User Not Updated!");
 	}
+
+	public CustomResponse validateUserUpdateRequest(userDto request) {
+		if (request.getId() == null || request.getId() < 0)
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Please Provide Id");
+		else if (request.getName() == null || request.getName().isBlank())
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Please Provide Name");
+		else if (!checkFullName(request.getName()))
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), "Name should be valid.", null);
+		else if (request.getUserName() == null || request.getUserName().isBlank())
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Please Provide UserName");
+		else if (request.getEmail() == null || request.getEmail().isBlank())
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Please Provide Email");
+		else if (!checkMail(request.getEmail()))
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Email should be a valid.");
+		else if (request.getMobileNumber() == null || request.getMobileNumber().isBlank())
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Please Provide Mobile Number");
+		else if (!checkMobileNo(request.getMobileNumber()))
+			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "Mobile Number should be a valid.");
+		return new CustomResponse(HttpStatus.OK.value(), null, "ok");
+	}
 }

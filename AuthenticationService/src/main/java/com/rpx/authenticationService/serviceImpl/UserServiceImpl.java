@@ -1,12 +1,7 @@
 package com.rpx.authenticationService.serviceImpl;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -88,47 +83,76 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public CustomResponse updateUser(List<userDto> request) {
+	public CustomResponse updateUser(userDto dto) {
 		try {
-			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
-			List<String> userNameList = request.stream().filter(Objects::nonNull).map(userDto::getUserName).toList();
-			Map<String, User> userMap = userRepository.findByUserNameIn(userNameList).stream().filter(Objects::nonNull)
-					.collect(Collectors.toMap(User::getUserName, Function.identity()));
-			List<User> updateUserList = request.stream().filter(Objects::nonNull).map(e -> {
-				return setObject.convertUserDtoToEntity(e);
-			}).toList();
 
-			User loggedInUser = userDetails.get();
-			Date date = new Date();
-			if (updateUserList != null && !updateUserList.isEmpty()) {
-				for (User user : updateUserList) {
-					if (userMap.containsKey(user.getUserName())) {
-						User userToUpdate = userMap.get(user.getUserName());
-						if (user.getId() == null) {
-							userToUpdate.setName(user.getName());
-							userToUpdate.setUserName(user.getUserName());
-							userToUpdate.setEmail(user.getEmail());
-							userToUpdate.setMobileNumber(user.getMobileNumber());
-							user.setCreatedOn(date);
-							user.setCreatedBy(loggedInUser);
-						} else {
-							userToUpdate.setId(user.getId());
-							userToUpdate.setName(user.getName());
-							userToUpdate.setUserName(user.getUserName());
-							userToUpdate.setEmail(user.getEmail());
-							userToUpdate.setMobileNumber(user.getMobileNumber());
-							user.setUpdatedOn(date);
-							user.setUpdatedBy(loggedInUser);
-						}
-					}
-				}
-			}
+			Optional<User> loggedInUser = customizedUserDetailServiceImpl.getUserDetails();
 
-			userRepository.saveAll(updateUserList);
-			return new CustomResponse(HttpStatus.OK.value(), null, "Updated Successfully!");
+			User user = userRepository.findById(dto.getId()).get();
+			if (user == null || !user.getIsActive())
+				return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "User Not Found");
 
+			if (!user.getUserName().equalsIgnoreCase(dto.getUserName())
+					&& userRepository.findByUserName(dto.getUserName()).isPresent())
+				return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, "UserName Already Taken");
+
+			user.setName(dto.getName());
+			user.setEmail(dto.getEmail());
+			user.setMobileNumber(dto.getMobileNumber());
+			user.setUserName(dto.getUserName());
+			user.setUpdatedBy(loggedInUser.isPresent() ? loggedInUser.get() : null);
+			user.setUpdatedOn(new Date());
+
+			userRepository.save(user);
+
+			return new CustomResponse(HttpStatus.OK.value(), null, "User Updated Successfully!");
 		} catch (Exception e) {
 			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, HttpStatus.BAD_REQUEST.toString());
 		}
 	}
+
+//	@Override
+//	public CustomResponse updateUser(List<userDto> request) {
+//		try {
+//			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
+//			List<String> userNameList = request.stream().filter(Objects::nonNull).map(userDto::getUserName).toList();
+//			Map<String, User> userMap = userRepository.findByUserNameIn(userNameList).stream().filter(Objects::nonNull)
+//					.collect(Collectors.toMap(User::getUserName, Function.identity()));
+//			List<User> updateUserList = request.stream().filter(Objects::nonNull).map(e -> {
+//				return setObject.convertUserDtoToEntity(e);
+//			}).toList();
+//
+//			User loggedInUser = userDetails.get();
+//			Date date = new Date();
+//			if (updateUserList != null && !updateUserList.isEmpty()) {
+//				for (User user : updateUserList) {
+//					if (userMap.containsKey(user.getUserName())) {
+//						User userToUpdate = userMap.get(user.getUserName());
+//						if (user.getId() == null) {
+//							userToUpdate.setName(user.getName());
+//							userToUpdate.setUserName(user.getUserName());
+//							userToUpdate.setEmail(user.getEmail());
+//							userToUpdate.setMobileNumber(user.getMobileNumber());
+//							user.setCreatedOn(date);
+//							user.setCreatedBy(loggedInUser);
+//						} else {
+//							userToUpdate.setId(user.getId());
+//							userToUpdate.setName(user.getName());
+//							userToUpdate.setUserName(user.getUserName());
+//							userToUpdate.setEmail(user.getEmail());
+//							userToUpdate.setMobileNumber(user.getMobileNumber());
+//							user.setUpdatedOn(date);
+//							user.setUpdatedBy(loggedInUser);
+//						}
+//					}
+//				}
+//			}
+//
+//			userRepository.saveAll(updateUserList);
+//			return new CustomResponse(HttpStatus.OK.value(), null, "Updated Successfully!");
+//
+//		} catch (Exception e) {
+//			return new CustomResponse(HttpStatus.BAD_REQUEST.value(), null, HttpStatus.BAD_REQUEST.toString());
+//		}
+//	}
 }

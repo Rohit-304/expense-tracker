@@ -1,7 +1,5 @@
 package com.rpx.authenticationService.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +24,8 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping("/v1/update")
-	public ResponseEntity<?> updateUser(@RequestBody List<userDto> dto) {
-		CustomResponse validationResponse = validation.validateListOfUser(dto);
+	public ResponseEntity<?> updateUser(@RequestBody userDto dto) {
+		CustomResponse validationResponse = validation.validateUserUpdateRequest(dto);
 		if (validationResponse.getCode() == HttpStatus.OK.value()) {
 			CustomResponse response = userService.updateUser(dto);
 			return ResponseEntity.ok(response);
