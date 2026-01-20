@@ -10,7 +10,7 @@ public interface UserService {
 
 	CustomResponse getloginCredential(LoginRequestDto requestDto);
 
-	CustomResponse saveOrUpdateUser(List<userDto> request);
+	CustomResponse updateUser(List<userDto> request);
 
 	CustomResponse userRegister(userDto dto);
 

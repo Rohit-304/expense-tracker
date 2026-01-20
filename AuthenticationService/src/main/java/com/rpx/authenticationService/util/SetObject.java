@@ -1,7 +1,5 @@
 package com.rpx.authenticationService.util;
 
-import java.util.Date;
-
 import org.springframework.stereotype.Component;
 
 import com.rpx.authenticationService.dto.LoginResponseDto;

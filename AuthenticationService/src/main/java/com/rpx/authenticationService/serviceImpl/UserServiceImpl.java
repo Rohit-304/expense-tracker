@@ -2,8 +2,11 @@ package com.rpx.authenticationService.serviceImpl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,6 +72,7 @@ public class UserServiceImpl implements UserService {
 		try {
 			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
 			User user = setObject.convertUserDtoToEntity(dto);
+			user.setPassword(dto.getPassword());
 			String encodedPassword = passwordEncoder.encode(user.getPassword());
 			user.setPassword(encodedPassword);
 			if (userDetails.isPresent()) {
@@ -84,21 +88,38 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public CustomResponse saveOrUpdateUser(List<userDto> request) {
+	public CustomResponse updateUser(List<userDto> request) {
 		try {
 			Optional<User> userDetails = customizedUserDetailServiceImpl.getUserDetails();
-			List<User> updateUserList = request.stream().filter(Objects::nonNull)
-					.map(e -> setObject.convertUserDtoToEntity(e)).toList();
+			List<String> userNameList = request.stream().filter(Objects::nonNull).map(userDto::getUserName).toList();
+			Map<String, User> userMap = userRepository.findByUserNameIn(userNameList).stream().filter(Objects::nonNull)
+					.collect(Collectors.toMap(User::getUserName, Function.identity()));
+			List<User> updateUserList = request.stream().filter(Objects::nonNull).map(e -> {
+				return setObject.convertUserDtoToEntity(e);
+			}).toList();
+
 			User loggedInUser = userDetails.get();
 			Date date = new Date();
 			if (updateUserList != null && !updateUserList.isEmpty()) {
 				for (User user : updateUserList) {
-					if (user.getId() == null) {
-						user.setCreatedOn(date);
-						user.setCreatedBy(loggedInUser);
-					} else {
-						user.setUpdatedOn(date);
-						user.setUpdatedBy(loggedInUser);
+					if (userMap.containsKey(user.getUserName())) {
+						User userToUpdate = userMap.get(user.getUserName());
+						if (user.getId() == null) {
+							userToUpdate.setName(user.getName());
+							userToUpdate.setUserName(user.getUserName());
+							userToUpdate.setEmail(user.getEmail());
+							userToUpdate.setMobileNumber(user.getMobileNumber());
+							user.setCreatedOn(date);
+							user.setCreatedBy(loggedInUser);
+						} else {
+							userToUpdate.setId(user.getId());
+							userToUpdate.setName(user.getName());
+							userToUpdate.setUserName(user.getUserName());
+							userToUpdate.setEmail(user.getEmail());
+							userToUpdate.setMobileNumber(user.getMobileNumber());
+							user.setUpdatedOn(date);
+							user.setUpdatedBy(loggedInUser);
+						}
 					}
 				}
 			}
